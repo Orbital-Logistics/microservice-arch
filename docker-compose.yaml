@@ -109,8 +109,8 @@ services:
     build: ./config-server
     container_name: config-server
     environment:
-      - CONFIG_USERNAME=OSkull32
-      - CONFIG_TOKEN=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
+      - CONFIG_USERNAME=${CONFIG_USERNAME}
+      - CONFIG_TOKEN=${CONFIG_TOKEN}
     ports:
       - 8888:8888
     depends_on:
