@@ -102,6 +102,8 @@ class SpacecraftServiceTest {
                 BigDecimal.ZERO,
                 BigDecimal.ZERO
         );
+
+        spacecraftService.setSpacecraftTypeService(spacecraftTypeService);
     }
 
     @Test
