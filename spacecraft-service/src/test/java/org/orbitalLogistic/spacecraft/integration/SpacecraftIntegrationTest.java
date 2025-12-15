@@ -117,9 +117,9 @@ class SpacecraftIntegrationTest {
                 .andExpect(jsonPath("$.currentLocation").value("Updated Location"));
 
         mockMvc.perform(put("/api/spacecrafts/" + spacecraftId + "/status")
-                        .param("status", "IN_MISSION"))
+                        .param("status", "IN_TRANSIT"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("IN_MISSION"));
+                .andExpect(jsonPath("$.status").value("IN_TRANSIT"));
 
         mockMvc.perform(get("/api/spacecrafts")
                         .param("name", "Updated Integration")
@@ -332,12 +332,12 @@ class SpacecraftIntegrationTest {
         spacecraftRepository.save(inMission);
 
         mockMvc.perform(get("/api/spacecrafts")
-                        .param("status", "IN_MISSION")
+                        .param("status", "IN_TRANSIT")
                         .param("page", "0")
                         .param("size", "20"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(1))
-                .andExpect(jsonPath("$.content[0].status").value("IN_MISSION"));
+                .andExpect(jsonPath("$.content[0].status").value("IN_TRANSIT"));
     }
 }
 
