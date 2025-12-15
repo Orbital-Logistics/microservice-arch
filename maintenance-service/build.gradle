@@ -77,3 +77,14 @@ test {
 jacocoTestReport {
     dependsOn test
 }
+
+tasks.register('unitTest', Test) {
+    group = "verification"
+
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+
+    useJUnitPlatform {
+        excludeTags "integration-tests"
+    }
+}
