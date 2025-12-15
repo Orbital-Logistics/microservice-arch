@@ -1,6 +1,7 @@
 package org.orbitalLogistic.maintenance.integration;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.orbitalLogistic.maintenance.clients.spacecraft.SpacecraftServiceClient;
 import org.orbitalLogistic.maintenance.clients.user.UserServiceClient;
@@ -38,6 +39,7 @@ import static org.mockito.Mockito.when;
 @AutoConfigureWebTestClient
 @Testcontainers
 @ActiveProfiles("test")
+@Tag("integration-tests")
 @TestPropertySource(properties = {
         "spring.cloud.config.enabled=false"
 })
