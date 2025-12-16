@@ -87,6 +87,14 @@ public class CargoManifestService {
             manifest.setPriority(org.orbitalLogistic.inventory.entities.enums.ManifestPriority.NORMAL);
         }
 
+        if (manifest.getUnloadedByUserId() != null) {
+            manifest.setManifestStatus(org.orbitalLogistic.inventory.entities.enums.ManifestStatus.UNLOADED);
+        }
+        if (manifest.getManifestStatus() == org.orbitalLogistic.inventory.entities.enums.ManifestStatus.UNLOADED
+                && manifest.getUnloadedByUserId() == null) {
+            throw new InvalidOperationException("Unloaded by user must be provided when manifest status is UNLOADED");
+        }
+
         CargoManifest saved = cargoManifestRepository.save(manifest);
         return toResponseDTO(saved);
     }
@@ -108,6 +116,14 @@ public class CargoManifestService {
             validateEntity(userServiceClient.userExists(request.unloadedByUserId()),
                     "Unloaded by user", request.unloadedByUserId(), "User service");
             manifest.setUnloadedByUserId(request.unloadedByUserId());
+        }
+
+        if (manifest.getUnloadedByUserId() != null) {
+            manifest.setManifestStatus(org.orbitalLogistic.inventory.entities.enums.ManifestStatus.UNLOADED);
+        }
+        if (manifest.getManifestStatus() == org.orbitalLogistic.inventory.entities.enums.ManifestStatus.UNLOADED
+                && manifest.getUnloadedByUserId() == null) {
+            throw new InvalidOperationException("Unloaded by user must be provided when manifest status is UNLOADED");
         }
 
         CargoManifest updated = cargoManifestRepository.save(manifest);
