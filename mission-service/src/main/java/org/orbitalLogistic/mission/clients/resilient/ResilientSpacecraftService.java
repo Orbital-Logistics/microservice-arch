@@ -28,11 +28,7 @@ public class ResilientSpacecraftService {
 
     public SpacecraftDTO fallbackGetSpacecraftById(Long id, Throwable t) {
         log.error("Fallback triggered for spacecraft ID: {}. Error: {}", id, t.getMessage(), t);
-        
-        if (!(t instanceof SpacecraftServiceException && t.getMessage().contains("not found"))) {
-            throw new SpacecraftServiceException("Spacecraft Service unavailable!");
-        }
-        throw (SpacecraftServiceException) t;
+        throw new SpacecraftServiceException("Spacecraft Service unavailable!");
     }
     
     @CircuitBreaker(name = "spacecraftService", fallbackMethod = "spacecraftExistsFallback")
@@ -46,12 +42,6 @@ public class ResilientSpacecraftService {
     
     public Boolean spacecraftExistsFallback(Long id, Throwable t) {
         log.error("Fallback for spacecraftExists ID: {}. Error: {}", id, t.getMessage());
-        
-        if (t instanceof java.net.NoRouteToHostException || 
-            t instanceof java.net.UnknownHostException) {
-            return false;
-        }
-
         throw new SpacecraftServiceException("Spacecraft Service unavailable!");
     }
 }

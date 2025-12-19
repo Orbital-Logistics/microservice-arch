@@ -1,5 +1,5 @@
 package org.orbitalLogistic.user.entities.enums;
 
-public enum UserRoles {
+public enum Roles {
     USER, OPERATOR, SUPPORT, ADMIN
 }

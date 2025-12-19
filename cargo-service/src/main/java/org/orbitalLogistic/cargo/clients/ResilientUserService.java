@@ -1,14 +1,11 @@
 package org.orbitalLogistic.cargo.clients;
 
-import java.util.function.Supplier;
-
+import org.orbitalLogistic.cargo.exceptions.UserNotFoundException;
 import org.orbitalLogistic.cargo.exceptions.UserServiceException;
 import org.springframework.stereotype.Component;
 
 import feign.FeignException;
-import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
-import io.github.resilience4j.circuitbreaker.CircuitBreaker;
-import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,66 +14,28 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ResilientUserService {
     private final UserServiceClient userServiceApi;
-    private final CircuitBreakerRegistry registry;
+
+    @CircuitBreaker(name = "userService", fallbackMethod = "getUserByIdFallback")
     public String getUserById(Long id) {
-        CircuitBreaker cb = registry.circuitBreaker("userService");
-    
-        Supplier<String> supplier = CircuitBreaker.decorateSupplier(
-            cb,
-            () -> userServiceApi.getUserById(id)
-        );
-        
         try {
-            return supplier.get();
-        } catch (CallNotPermittedException e) {
-            return getUserByIdFallback(id, e);
+            return userServiceApi.getUserById(id);
         } catch (FeignException.NotFound e) {
-            throw new UserServiceException("User with ID " + id + " not found", e);
+            throw new UserNotFoundException("User with ID " + id + " not found");
         }
     }
-
-    // public SpacecraftCargoUsageDTO getSpacecraftCargoUsageFallback(Long spacecraftId, Throwable e) {
-    //     log.error("FALLBACK getCargoById! status: {}, error: {}", spacecraftId, e.getClass().getSimpleName());
-    //     throw new SpacecraftCargoUsageException("Cargo Service unavailable!");
-    // }
-
-    // // @CircuitBreaker(name = "userService", fallbackMethod = "getUserByIdFallback")
-    // public String getUserById(Long id) {
-    //     try {
-    //         return userServiceApi.getUserById(id);
-    //     } catch (FeignException.NotFound e) {
-    //         throw new UserNotFoundException("User with ID " + id + " not found");
-    //     }
-    // }
 
     public String getUserByIdFallback(Long id, Throwable t) {
         log.error("FALLBACK getUsernameById! status: {}, error: {}", id, t.getClass().getSimpleName());
         throw new UserServiceException("User service unavailable!");
     }
 
-    // @CircuitBreaker(name = "userService", fallbackMethod = "userExistsFallback")
+    @CircuitBreaker(name = "userService", fallbackMethod = "userExistsFallback")
     public Boolean userExists(Long id) {
-        CircuitBreaker cb = registry.circuitBreaker("userService");
-    
-        Supplier<Boolean> supplier = CircuitBreaker.decorateSupplier(
-            cb,
-            () -> userServiceApi.userExists(id)
-        );
-        
-        try {
-            return supplier.get();
-        } catch (CallNotPermittedException e) {
-            return userExistsFallback(id, e);
-        } catch (FeignException.NotFound e) {
-            throw new UserServiceException("User with ID " + id + " not found", e);
-        }
+        return userServiceApi.userExists(id);
     }
 
     public Boolean userExistsFallback(Long id, Throwable t) {
         log.error("FALLBACK userExists! userId: {}, error: {}", id, t.getClass().getSimpleName());
-        if (!(t instanceof UserServiceException && t.getMessage().contains("not found"))) {
-            throw new UserServiceException("User service unavailable", t);
-        }
-        throw (UserServiceException) t;
+        throw new UserServiceException("User service unavailable");
     }
 }
