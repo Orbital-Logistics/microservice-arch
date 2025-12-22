@@ -37,7 +37,7 @@ public class AuthService {
             throw new UsernameAlreadyExistsException("");
         }
 
-        if (usersService.emailExists(username)) {
+        if (usersService.emailExists(email)) {
             throw new EmailAlreadyExistsException("");
         }
 

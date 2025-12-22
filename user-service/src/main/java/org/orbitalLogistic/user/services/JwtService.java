@@ -33,8 +33,12 @@ public class JwtService {
                 .subject(userDetails.getUsername())
                 .claim("roles", userDetails.getAuthorities()
                         .stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .toList())
+                        .map(authority -> {
+                            String auth = authority.getAuthority();
+                            return auth.startsWith("ROLE_") ? auth.substring(5) : auth;
+                        })
+                        .toList()
+                )
                 .expiration(Date.from(now.plus(Duration.ofSeconds(jwtExpiration))))
                 .signWith(getSigningKey())
                 .compact();
